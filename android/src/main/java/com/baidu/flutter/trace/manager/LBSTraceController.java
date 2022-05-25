@@ -1,6 +1,12 @@
 package com.baidu.flutter.trace.manager;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
 
 import java.util.Map;
 
@@ -10,6 +16,7 @@ import com.baidu.trace.LBSTraceClient;
 import com.baidu.trace.model.LocationMode;
 
 import androidx.annotation.NonNull;
+
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -35,6 +42,42 @@ public class LBSTraceController implements MethodChannel.MethodCallHandler {
                 "flutter_baidu_yingyan_trace");
         mMethodChannel.setMethodCallHandler(this);
         mContext = flutterPluginBinding.getApplicationContext();
+    }
+
+    // Create a notification
+    public Notification createNotification() {
+        Notification.Builder builder = new Notification.Builder(mContext);
+        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            builder.setOngoing(true);
+            builder.setShowWhen(false);
+            builder.setSmallIcon(getAppIconResourceId());
+            builder.setContentIntent(createContentIntent());
+            builder.setContentTitle("上班中");
+            builder.setContentText("做最好的服务，让顾客开心");
+
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && null !=
+                notificationManager) {
+            NotificationChannel notificationChannel =
+                    new NotificationChannel("trace", "trace_channel",
+                            NotificationManager.IMPORTANCE_HIGH);
+            notificationManager.createNotificationChannel(notificationChannel);
+            builder.setChannelId("trace"); // Android OchannelId
+        }
+
+        Notification notification = builder.build();
+        notification.defaults = Notification.DEFAULT_SOUND;
+        return notification;
+    }
+
+    private int getAppIconResourceId() {
+        return mContext.getApplicationInfo().icon;
+    }
+
+    private PendingIntent createContentIntent() {
+        Intent notificationIntent = new Intent(mContext, mContext.getClass());
+        return PendingIntent.getActivity(mContext, 0, notificationIntent, 0);
     }
 
     public void release() {
@@ -121,14 +164,14 @@ public class LBSTraceController implements MethodChannel.MethodCallHandler {
             if (mContext != null) {
                 try {
                     boolean isAgree = call.argument("isAgree");
-                    
+
                     LBSTraceClient.setAgreePrivacy(mContext, isAgree);
                     mLBSTraceClient = new LBSTraceClient(mContext);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-        } else  {
+        } else {
             result.notImplemented();
         }
     }

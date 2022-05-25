@@ -75,6 +75,10 @@ public class TraceManager extends BaseManager {
             return;
         }
 
+        if (traceOption.startNotification) {
+            traceOption.notification = mLBSTraceController.createNotification();
+        }
+
         mLBSTraceController.getLBSTraceClient().startTrace(traceOption.toTrace(),
                 new PluginOnTraceListener());
 

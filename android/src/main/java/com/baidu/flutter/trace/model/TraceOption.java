@@ -1,5 +1,7 @@
 package com.baidu.flutter.trace.model;
 
+import android.app.Notification;
+
 import com.baidu.trace.Trace;
 
 /**
@@ -18,6 +20,13 @@ public class TraceOption {
     public String entityName = "";
 
     /**
+     * 是否生成一个前台服务通知
+     */
+    public boolean startNotification = false;
+
+    public Notification notification;
+
+    /**
      * 该entityName只用于数据库升级
      */
     public String dbEntityName = "";
@@ -26,6 +35,10 @@ public class TraceOption {
         Trace trace = new Trace();
         trace.setServiceId(serviceId);
         trace.setEntityName(entityName);
+        if (startNotification && notification != null) {
+            trace.setNotification(notification);
+        }
+
         return trace;
     }
 }
