@@ -7,15 +7,18 @@ class Trace {
   /// 用户自定义的entity标识，同一serviceId下该字段不允许重复，是entity的唯一标识 （必传）
   String? entityName;
 
+  bool? startNotification;
+
   /// 该dbEntityName只用于数据库升级(Android 独有)
   String? dbEntityName = "";
 
   Trace(
-      {required this.serviceId, required this.entityName, this.dbEntityName});
+      {required this.serviceId, required this.entityName, this.startNotification = false, this.dbEntityName});
 
   Trace.fromMap(Map map) : assert(map != null) { // ignore: unnecessary_null_comparison
     serviceId = map['serviceId'];
     entityName = map['entityName'];
+    startNotification = map['startNotification'];
     dbEntityName = map['dbEntityName'];
   }
 
@@ -23,6 +26,7 @@ class Trace {
     return {
       "serviceId": this.serviceId,
       "entityName": this.entityName,
+      "startNotification": this.startNotification,
       "dbEntityName": this.dbEntityName,
     };
   }
